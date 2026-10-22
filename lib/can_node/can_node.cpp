@@ -14,7 +14,7 @@ bool can_send::init_can()
   }
 
   // switches the mcp2515 from config mode to normal mode
-  mcp2515.setNormalMode(); 
+  _can.setNormalMode(); 
   Serial.println("Sender ready");
   return true;
 }
@@ -30,17 +30,17 @@ bool can_send::send_can(const can_frame& frame)
 
   else {
     uint8_t eflg = _can.getErrorFlags();
-	uint8_t tec = _can.errorCountTX();
-	uint8_t rec = _can.errorCountRX();
+	  uint8_t tec = _can.errorCountTX();
+	  uint8_t rec = _can.errorCountRX();
 
-	Serial.print("Send failed. EFLG=0x");
+	  Serial.print("Send failed. EFLG=0x");
     Serial.print(eflg, HEX);
-	Serial.print(" TEC=");
-	Serial.print(tec);
-	Serial.print(" REC=");
-	Serial.print(rec);
+	  Serial.print(" TEC=");
+	  Serial.print(tec);
+	  Serial.print(" REC=");
+	  Serial.print(rec);
 
-	Serial.println();
+	  Serial.println();
     return false;
   }
 }
