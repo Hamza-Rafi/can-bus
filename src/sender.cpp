@@ -1,36 +1,22 @@
-#include "WSerial.h"
-#include "api/Common.h"
-#include "mcp2515.h"
-#include "pins_arduino_digital.h"
-#include "variant_NUCLEO_F446RE.h"
-#include <cstdint>
+#include <Arduino.h>
+#include "can_node.h"
 
 // D10 is the CS pin
-MCP2515 mcp2515(D10);
+can_send sender(D10);
 
-void setup(){
-	Serial.begin(115200);
+void setup() {
+    Serial.begin(115200);
+    delay(5000); // just there to see the init message this can be commented out
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
 
-	pinMode(LED_BUILTIN, OUTPUT);
-	digitalWrite(LED_BUILTIN, LOW);
-
-	// reset signal puts mcp2515 into config mode
-	mcp2515.reset();
-
-	MCP2515::ERROR err =  mcp2515.setBitrate(CAN_500KBPS, MCP_8MHZ);
-	if (err != MCP2515::ERROR_OK) {
-		Serial.println("MCP2515 init failed!");
-		while (1);
-	}
-
-	// switches the mcp2515 from config mode to normal mode
-	mcp2515.setNormalMode(); 
-	// mcp2515.setLoopbackMode(); 
-	Serial.println("Sender ready");
+    if (!sender.init_can()) {
+        while (1);   // halt if the MCP2515 didn't initialise
+    }
 }
 
 void loop(){
-	struct can_frame frame;
+	/*struct can_frame frame;
 	frame.can_id = 0x123;
 	frame.can_dlc = 4; // Data Length Code - How many bytes of data
 	
@@ -61,5 +47,5 @@ void loop(){
 	}
 
 	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-	delay(1000);
+	delay(1000);*/
 }
