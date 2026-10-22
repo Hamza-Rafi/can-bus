@@ -2,7 +2,7 @@
 #include "can_node.h"
 
 // D10 is the CS pin
-can_send sender(D10);
+can_node sender(D10);
 
 void setup() {
     Serial.begin(115200);
@@ -24,7 +24,7 @@ void loop(){
     frame.data[1] = 0x34;
     frame.data[2] = 0x56;
     frame.data[3] = 0x78;
-	
+
     sender.send_can(frame);
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     delay(1000);
