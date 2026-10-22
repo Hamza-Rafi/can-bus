@@ -13,9 +13,8 @@ class can_send {
   public:
     can_send(uint8_t cs_pin);
     bool init_can();
-    bool send_can(const can_frame& frame);
-    
-    
+    bool send_can(can_frame& frame);
+
   private:
     MCP2515 _can;
 };

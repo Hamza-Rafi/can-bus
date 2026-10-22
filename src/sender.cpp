@@ -16,36 +16,16 @@ void setup() {
 }
 
 void loop(){
-	/*struct can_frame frame;
-	frame.can_id = 0x123;
-	frame.can_dlc = 4; // Data Length Code - How many bytes of data
+    struct can_frame frame;
+    frame.can_id = 0x123;
+    frame.can_dlc = 4; // Data Length Code - How many bytes of data
+
+    frame.data[0] = 0x12;
+    frame.data[1] = 0x34;
+    frame.data[2] = 0x56;
+    frame.data[3] = 0x78;
 	
-	frame.data[0] = 0x12;
-	frame.data[1] = 0x34;
-	frame.data[2] = 0x56;
-	frame.data[3] = 0x78;
-
-	MCP2515::ERROR err = mcp2515.sendMessage(&frame);
-
-	if (err == MCP2515::ERROR_OK) {
-		Serial.println("frame sent");
-	} else {
-		// get the error flags on error
-		uint8_t eflg = mcp2515.getErrorFlags();
-		uint8_t tec = mcp2515.errorCountTX();
-		uint8_t rec = mcp2515.errorCountRX();
-
-		Serial.print("Send failed. EFLG=0x");
-		Serial.print(eflg, HEX);
-		Serial.print(" TEC=");
-		Serial.print(tec);
-		Serial.print(" REC=");
-		Serial.print(rec);
-
-		Serial.println();
-
-	}
-
-	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-	delay(1000);*/
+    sender.send_can(frame);
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    delay(1000);
 }

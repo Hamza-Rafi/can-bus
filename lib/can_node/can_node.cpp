@@ -19,28 +19,28 @@ bool can_send::init_can()
   return true;
 }
 
-bool can_send::send_can(const can_frame& frame)
+bool can_send::send_can(can_frame& frame)
 {
   MCP2515::ERROR err = _can.sendMessage(&frame);
   
   if (err == MCP2515::ERROR_OK) {
-	Serial.println("frame sent");
+    Serial.println("frame sent");
     return true;
   }
 
   else {
     uint8_t eflg = _can.getErrorFlags();
-	  uint8_t tec = _can.errorCountTX();
-	  uint8_t rec = _can.errorCountRX();
+    uint8_t tec = _can.errorCountTX();
+    uint8_t rec = _can.errorCountRX();
 
-	  Serial.print("Send failed. EFLG=0x");
+    Serial.print("Send failed. EFLG=0x");
     Serial.print(eflg, HEX);
-	  Serial.print(" TEC=");
-	  Serial.print(tec);
-	  Serial.print(" REC=");
-	  Serial.print(rec);
+    Serial.print(" TEC=");
+    Serial.print(tec);
+    Serial.print(" REC=");
+    Serial.print(rec);
 
-	  Serial.println();
+    Serial.println();
     return false;
   }
 }
