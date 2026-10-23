@@ -1,4 +1,4 @@
-#include "can_node.h"
+#include <can_node.h>
 
 can_node::can_node(uint8_t csPin) : _can(csPin) {}
 
@@ -15,7 +15,6 @@ bool can_node::init_can()
 
     // switches the mcp2515 from config mode to normal mode
     _can.setNormalMode(); 
-    Serial.println("MCP2515 ready");
     return true;
 }
 
@@ -24,7 +23,22 @@ bool can_node::send_can(can_frame& frame)
     MCP2515::ERROR err = _can.sendMessage(&frame);
   
     if (err == MCP2515::ERROR_OK) {
-        Serial.println("frame sent");
+        Serial.print("frame sent: ");
+
+
+        // print the can frame sent
+        Serial.print("ID: 0x");
+        Serial.print(frame.can_id, HEX);
+        Serial.print("\t");
+
+        Serial.print("Data: ");
+        for (int i = 0; i < frame.can_dlc; i++) {
+            Serial.print(frame.data[i], HEX);
+            Serial.print(" ");
+        }
+
+        Serial.println("");
+
         return true;
     }
     else {
