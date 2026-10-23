@@ -1,65 +1,45 @@
-#include "WSerial.h"
-#include "api/Common.h"
-#include "mcp2515.h"
-#include "pins_arduino_digital.h"
-#include "variant_NUCLEO_F446RE.h"
-#include <cstdint>
+#include <Arduino.h>
+#include <can_node.h>
 
 // D10 is the CS pin
-MCP2515 mcp2515(D10);
 
-void setup(){
-	Serial.begin(115200);
+#ifdef ARDUINO_AVR_UNO
+can_node sender(10);
+#else
+can_node sender(D10);
+#endif 
 
-	pinMode(LED_BUILTIN, OUTPUT);
-	digitalWrite(LED_BUILTIN, LOW);
+uint32_t count = 0;
+bool led_state = LOW;
 
-	// reset signal puts mcp2515 into config mode
-	mcp2515.reset();
+void setup() {
+    Serial.begin(115200);
+    delay(5000); // just there to see the init message this can be commented out
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, led_state);
 
-	MCP2515::ERROR err =  mcp2515.setBitrate(CAN_500KBPS, MCP_8MHZ);
-	if (err != MCP2515::ERROR_OK) {
-		Serial.println("MCP2515 init failed!");
-		while (1);
-	}
-
-	// switches the mcp2515 from config mode to normal mode
-	mcp2515.setNormalMode(); 
-	// mcp2515.setLoopbackMode(); 
-	Serial.println("Sender ready");
+    if (!sender.init_can()) {
+        while (1);   // halt if the MCP2515 didn't initialise
+    }
 }
 
+
 void loop(){
-	struct can_frame frame;
-	frame.can_id = 0x123;
-	frame.can_dlc = 4; // Data Length Code - How many bytes of data
-	
-	frame.data[0] = 0x12;
-	frame.data[1] = 0x34;
-	frame.data[2] = 0x56;
-	frame.data[3] = 0x78;
+    struct can_frame frame;
+    frame.can_id = 0x123;
+    frame.can_dlc = 4; // Data Length Code - How many bytes of data
 
-	MCP2515::ERROR err = mcp2515.sendMessage(&frame);
+    frame.data[0] = (count >> 24) & 0xFF;
+    frame.data[1] = (count >> 16) & 0xFF;
+    frame.data[2] = (count >> 8) & 0xFF;
+    frame.data[3] = count & 0xFF;
 
-	if (err == MCP2515::ERROR_OK) {
-		Serial.println("frame sent");
-	} else {
-		// get the error flags on error
-		uint8_t eflg = mcp2515.getErrorFlags();
-		uint8_t tec = mcp2515.errorCountTX();
-		uint8_t rec = mcp2515.errorCountRX();
+    sender.send_can(frame);
+    count++;
 
-		Serial.print("Send failed. EFLG=0x");
-		Serial.print(eflg, HEX);
-		Serial.print(" TEC=");
-		Serial.print(tec);
-		Serial.print(" REC=");
-		Serial.print(rec);
+    // toggle led
+    led_state = !led_state;
+    digitalWrite(LED_BUILTIN, led_state);
 
-		Serial.println();
-
-	}
-
-	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-	delay(1000);
+    delay(1000);
 }

@@ -1,41 +1,23 @@
-#include "WSerial.h"
-#include "api/Print.h"
-#include "mcp2515.h"
-#include <Arduino.h>
+#include "can_node.h"
 
-MCP2515 mcp2515(D10);
+
+#ifdef ARDUINO_AVR_UNO
+can_node receiver(10);
+#else
+can_node receiver(D10);
+#endif 
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  mcp2515.reset();
+    if (!receiver.init_can()) {
+        while (1);   // halt if the MCP2515 didn't initialise
+    }
 
-  MCP2515::ERROR err = mcp2515.setBitrate(CAN_500KBPS, MCP_8MHZ);
-  if (err != MCP2515::ERROR_OK) {
-    Serial.println("MCP2515 init failed");
-    while (1)
-      ;
-  }
-
-  mcp2515.setNormalMode();
-  Serial.println("Receiver ready");
+    Serial.println("Receiver ready");
 }
 
 void loop() {
-  struct can_frame frame;
-
-  // print can frame id
-  if (mcp2515.readMessage(&frame) == MCP2515::ERROR_OK) {
-    Serial.print("ID: 0x");
-    Serial.println(frame.can_id, HEX);
-
-    Serial.print("Data: ");
-    for (int i = 0; i < frame.can_dlc; i++) {
-      Serial.print(frame.data[i], HEX);
-      Serial.print(" ");
-    }
-
-    Serial.println(" ");
-    Serial.println(" ");
-  }
+    struct can_frame frame;
+    receiver.receive_can(frame);
 }
