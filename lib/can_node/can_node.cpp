@@ -27,20 +27,7 @@ bool can_node::send_can(can_frame& frame)
         Serial.println("frame sent");
         return true;
     }
-
     else {
-        uint8_t eflg = _can.getErrorFlags();
-        uint8_t tec = _can.errorCountTX();
-        uint8_t rec = _can.errorCountRX();
-
-        Serial.print("Send failed. EFLG=0x");
-        Serial.print(eflg, HEX);
-        Serial.print(" TEC=");
-        Serial.print(tec);
-        Serial.print(" REC=");
-        Serial.print(rec);
-
-        Serial.println();
         return false;
     }
 }
