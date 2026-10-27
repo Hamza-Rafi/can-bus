@@ -26,7 +26,7 @@ void setup() {
 
 void loop(){
     struct can_frame frame;
-    frame.can_id = 0x123;
+    frame.can_id = 0x456;
     frame.can_dlc = 4; // Data Length Code - How many bytes of data
 
     frame.data[0] = (count >> 24) & 0xFF;

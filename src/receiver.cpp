@@ -1,4 +1,4 @@
-#include "can_node.h"
+#include <can_node.h>
 
 
 #ifdef ARDUINO_AVR_UNO
