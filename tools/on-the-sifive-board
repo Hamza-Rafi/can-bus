@@ -1,0 +1,12 @@
+# stop the current attempt
+ip link set can0 down
+pkill slcand
+
+# one-time per plug-in: the reset happens here, then wait it out
+stty -F /dev/ttyACM0 -hupcl
+sleep 3
+
+# now slcand's commands reach the running sketch
+slcand -o -c -s6 -S 1000000 /dev/ttyACM0 can0
+ip link set can0 up
+candump can0
